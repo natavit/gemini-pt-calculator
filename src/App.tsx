@@ -16,13 +16,22 @@ const App: React.FC = () => {
   // Find current model or default - define this EARLY so we can use it for initial state
   const currentModel = GEMINI_MODELS.find(m => m.id === selectedModelId) || GEMINI_MODELS[2];
 
-  const [paygoInputPrice, setPaygoInputPrice] = useState(currentModel.paygoInputPrice);
-  const [paygoOutputPrice, setPaygoOutputPrice] = useState(currentModel.paygoOutputPrice);
-  const [ptMonthlyPrice, setPtMonthlyPrice] = useState(PT_PRICING.MONTHLY);
-  const [ptQuarterlyPrice, setPtQuarterlyPrice] = useState(PT_PRICING.QUARTERLY);
   const [ptYearlyPrice, setPtYearlyPrice] = useState(PT_PRICING.YEARLY);
   const [gsuCapacity, setGsuCapacity] = useState(currentModel.gsuCapacity);
 
+  // Granular PayGo Pricing State
+  const [priceInText, setPriceInText] = useState(currentModel.priceInText);
+  const [priceInImage, setPriceInImage] = useState(currentModel.priceInImage);
+  const [priceInVideo, setPriceInVideo] = useState(currentModel.priceInVideo);
+  const [priceInAudio, setPriceInAudio] = useState(currentModel.priceInAudio);
+
+  const [priceOutText, setPriceOutText] = useState(currentModel.priceOutText);
+  const [priceOutImage, setPriceOutImage] = useState(currentModel.priceOutImage);
+  const [priceOutVideo, setPriceOutVideo] = useState(currentModel.priceOutVideo);
+  const [priceOutAudio, setPriceOutAudio] = useState(currentModel.priceOutAudio);
+
+  const [ptMonthlyPrice, setPtMonthlyPrice] = useState(PT_PRICING.MONTHLY);
+  const [ptQuarterlyPrice, setPtQuarterlyPrice] = useState(PT_PRICING.QUARTERLY);
 
 
   // Derived state for display/calculation - could also be set via useEffect if we want them editable *after* selection
@@ -78,8 +87,16 @@ const App: React.FC = () => {
       setBurnOutVideo(config.burnOutVideo);
       setBurnOutAudio(config.burnOutAudio);
 
-      setPaygoInputPrice(config.paygoInputPrice);
-      setPaygoOutputPrice(config.paygoOutputPrice);
+      setPriceInText(config.priceInText);
+      setPriceInImage(config.priceInImage);
+      setPriceInVideo(config.priceInVideo);
+      setPriceInAudio(config.priceInAudio);
+
+      setPriceOutText(config.priceOutText);
+      setPriceOutImage(config.priceOutImage);
+      setPriceOutVideo(config.priceOutVideo);
+      setPriceOutAudio(config.priceOutAudio);
+
       setGsuCapacity(config.gsuCapacity);
     }
   }, [selectedModelId, totalInputTps]);
@@ -116,13 +133,24 @@ const App: React.FC = () => {
     // DECISION: For PayGo estimation, we will use the *Burndown Units* as a proxy for "Billable Units" (e.g. Tokens).
     // This is because 1 Image ≈ 258 Tokens in terms of capacity AND likely cost weight.
 
-    const totalBillableIn = totalBurnIn; // Assumption: Capacity weights ≈ Billing weights for Input
-    const totalBillableOut = (tpsOutText * 1.0) + (tpsOutImage * burnOutImage) + (tpsOutVideo * burnOutVideo) + (tpsOutAudio * burnOutAudio);
+    // PayGo calculation now granular
+    // We use a base "Per Million" unit for simplicity in input, 
+    // assuming prices entered are "Per 1 Million Units" for text/image/video/audio alike.
+    // If user enters $ amount for 1M images, this holds. 
 
-    const annualInputUnits = (totalBillableIn * secondsPeak) + (totalBillableIn * ratioDecimal * secondsOffPeak);
-    const annualOutputUnits = (totalBillableOut * secondsPeak) + (totalBillableOut * ratioDecimal * secondsOffPeak);
+    // Cost = (AnnualUnits / 1,000,000) * PricePerMillion
+    const costInText = ((tpsInText * secondsPeak) + (tpsInText * ratioDecimal * secondsOffPeak)) / 1e6 * priceInText;
+    const costInImage = ((tpsInImage * secondsPeak) + (tpsInImage * ratioDecimal * secondsOffPeak)) / 1e6 * priceInImage;
+    const costInVideo = ((tpsInVideo * secondsPeak) + (tpsInVideo * ratioDecimal * secondsOffPeak)) / 1e6 * priceInVideo;
+    const costInAudio = ((tpsInAudio * secondsPeak) + (tpsInAudio * ratioDecimal * secondsOffPeak)) / 1e6 * priceInAudio;
 
-    const paygoCost = ((annualInputUnits / 1e6) * paygoInputPrice) + ((annualOutputUnits / 1e6) * paygoOutputPrice);
+    const costOutText = ((tpsOutText * secondsPeak * 1.0) + (tpsOutText * ratioDecimal * secondsOffPeak * 1.0)) / 1e6 * priceOutText; // 1.0 multiplier for text billing
+    const costOutImage = ((tpsOutImage * secondsPeak) + (tpsOutImage * ratioDecimal * secondsOffPeak)) / 1e6 * priceOutImage;
+    const costOutVideo = ((tpsOutVideo * secondsPeak) + (tpsOutVideo * ratioDecimal * secondsOffPeak)) / 1e6 * priceOutVideo;
+    const costOutAudio = ((tpsOutAudio * secondsPeak) + (tpsOutAudio * ratioDecimal * secondsOffPeak)) / 1e6 * priceOutAudio;
+
+    const paygoCost = costInText + costInImage + costInVideo + costInAudio +
+      costOutText + costOutImage + costOutVideo + costOutAudio;
 
     const ptMonthlyCost = gsusNeeded * ptMonthlyPrice * 12;
     const ptQuarterlyCost = gsusNeeded * ptQuarterlyPrice * 12;
@@ -137,7 +165,9 @@ const App: React.FC = () => {
       totalBurnIn, totalBurnOut // Exported for UI
     };
   }, [
-    paygoInputPrice, paygoOutputPrice, ptMonthlyPrice, ptQuarterlyPrice, ptYearlyPrice, gsuCapacity,
+    priceInText, priceInImage, priceInVideo, priceInAudio,
+    priceOutText, priceOutImage, priceOutVideo, priceOutAudio,
+    ptMonthlyPrice, ptQuarterlyPrice, ptYearlyPrice, gsuCapacity,
     burnInText, burnInImage, burnInVideo, burnInAudio,
     burnOutText, burnOutImage, burnOutVideo, burnOutAudio,
     tpsInText, tpsInImage, tpsInVideo, tpsInAudio,
@@ -261,8 +291,9 @@ const App: React.FC = () => {
                 <div className="mt-3 ml-1 text-[10px] text-slate-400 font-medium uppercase tracking-wide space-y-1">
                   {/* Simplified info for multimodal - maybe just pricing? */}
                   <div className="flex gap-4 items-center">
-                    <span>Input $: <span className="text-slate-600 font-bold">${paygoInputPrice}</span></span>
-                    <span>Output $: <span className="text-slate-600 font-bold">${paygoOutputPrice}</span></span>
+                    <span className="text-slate-500">PayGo Est (Text):</span>
+                    <span>In <span className="text-slate-700 font-bold">${priceInText}</span></span>
+                    <span>Out <span className="text-slate-700 font-bold">${priceOutText}</span></span>
                     {isLongContext && <span className="bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded text-[9px] border border-indigo-200">LONG CONTEXT ACTIVE</span>}
                   </div>
                 </div>
@@ -341,11 +372,27 @@ const App: React.FC = () => {
                 <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Pricing Parameters</h2>
               </div>
               <div className="p-6">
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                  <div className="col-span-2 text-xs font-semibold text-slate-400 uppercase tracking-wide">PayGo Rates ($/1M)</div>
-                  <PriceInput label="Input" value={paygoInputPrice} setValue={setPaygoInputPrice} />
-                  <PriceInput label="Output" value={paygoOutputPrice} setValue={setPaygoOutputPrice} />
+                {/* Granular Pricing Grid */}
+                <div className="mb-6">
+                  <h4 className="text-xs font-bold text-slate-400 mb-3 uppercase tracking-wide">PayGo Rates ($/1M)</h4>
+                  <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+                    <div className="space-y-2">
+                      <div className="text-[10px] text-slate-400 uppercase font-semibold border-b border-slate-50 pb-1 mb-1">Inputs</div>
+                      <PriceInput label="Text In" value={priceInText} setValue={setPriceInText} />
+                      {tpsInImage > 0 && <PriceInput label="Image In" value={priceInImage} setValue={setPriceInImage} />}
+                      {tpsInVideo > 0 && <PriceInput label="Video In" value={priceInVideo} setValue={setPriceInVideo} />}
+                      {tpsInAudio > 0 && <PriceInput label="Audio In" value={priceInAudio} setValue={setPriceInAudio} />}
+                    </div>
+                    <div className="space-y-2">
+                      <div className="text-[10px] text-slate-400 uppercase font-semibold border-b border-slate-50 pb-1 mb-1">Outputs</div>
+                      <PriceInput label="Text Out" value={priceOutText} setValue={setPriceOutText} />
+                      {tpsOutImage > 0 && <PriceInput label="Image Out" value={priceOutImage} setValue={setPriceOutImage} />}
+                      {tpsOutVideo > 0 && <PriceInput label="Video Out" value={priceOutVideo} setValue={setPriceOutVideo} />}
+                      {tpsOutAudio > 0 && <PriceInput label="Audio Out" value={priceOutAudio} setValue={setPriceOutAudio} />}
+                    </div>
+                  </div>
                 </div>
+
                 <div className="grid grid-cols-2 gap-4">
                   <div className="col-span-2 text-xs font-semibold text-slate-400 uppercase tracking-wide">PT Commit ($/GSU)</div>
                   <PriceInput label="Monthly" value={ptMonthlyPrice} setValue={setPtMonthlyPrice} />
@@ -522,18 +569,54 @@ const App: React.FC = () => {
 
 // --- SUBCOMPONENTS ---
 
-const NumberInput = ({ label, value, setValue, step }: any) => (
-  <div>
-    <label className="block text-xs font-semibold text-slate-500 mb-1.5 ml-1">{label}</label>
-    <div className="relative group">
-      <input
-        type="number" value={value} onChange={(e) => setValue(Number(e.target.value))} step={step}
-        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-medium focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all group-hover:bg-slate-100"
-      />
-      <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-400 text-xs font-bold">TPS</div>
+const NumberInput = ({ label, value, setValue, step }: any) => {
+  const [localValue, setLocalValue] = React.useState(value.toString());
+
+  // Sync local value with prop value if they diverge significantly (e.g. external update)
+  // We avoid syncing if the difference is just formatting to prevent cursor jumps or fighting
+  React.useEffect(() => {
+    // Only update if the parsed local value is different from the prop value
+    // AND we are not currently effectively equal (handling 0 vs "0" vs "")
+    if (Number(localValue) !== value) {
+      setLocalValue(value.toString());
+    }
+  }, [value]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setLocalValue(val);
+    if (val === '') {
+      setValue(0);
+    } else {
+      const num = parseFloat(val);
+      if (!isNaN(num)) {
+        setValue(num);
+      }
+    }
+  };
+
+  const handleBlur = () => {
+    // On blur, strictly format back to the number prop to ensure consistency
+    setLocalValue(value.toString());
+  };
+
+  return (
+    <div>
+      <label className="block text-xs font-semibold text-slate-500 mb-1.5 ml-1">{label}</label>
+      <div className="relative group">
+        <input
+          type="number"
+          value={localValue}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          step={step}
+          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-medium focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all group-hover:bg-slate-100"
+        />
+        <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-400 text-xs font-bold">TPS</div>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const PriceInput = ({ label, value, setValue }: any) => (
   <div className="relative">

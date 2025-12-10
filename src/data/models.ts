@@ -12,13 +12,22 @@ export interface ModelConstraints {
     burnOutVideo: number; // usually N/A
     burnOutAudio: number; // usually N/A
 
-    paygoInputPrice: number;
-    paygoOutputPrice: number;
+    // Detailed PayGo Pricing (Per 1 Million Units)
+    priceInText: number;
+    priceInImage: number;
+    priceInVideo: number;
+    priceInAudio: number;
+
+    priceOutText: number;
+    priceOutImage: number;
+    priceOutVideo: number;
+    priceOutAudio: number;
+
     gsuCapacity: number;
 
     // Optional override for Long Context
     longContextConfig?: {
-        threshold: number; // e.g. 200000
+        threshold: number;
         burnInText: number;
         burnInImage: number;
         burnInVideo: number;
@@ -27,8 +36,16 @@ export interface ModelConstraints {
         burnOutImage: number;
         burnOutVideo: number;
         burnOutAudio: number;
-        paygoInputPrice: number;
-        paygoOutputPrice: number;
+
+        // Granular Pricing Overrides
+        priceInText: number;
+        priceInImage: number;
+        priceInVideo: number;
+        priceInAudio: number;
+        priceOutText: number;
+        priceOutImage: number;
+        priceOutVideo: number;
+        priceOutAudio: number;
     }
 }
 
@@ -46,8 +63,15 @@ export const GEMINI_MODELS: ModelConstraints[] = [
         burnOutVideo: 1, // N/A
         burnOutAudio: 1, // N/A
 
-        paygoInputPrice: 2, // Placeholder/Est
-        paygoOutputPrice: 12, // Placeholder/Est
+        priceInText: 2,
+        priceInImage: 2,
+        priceInVideo: 2,
+        priceInAudio: 2,
+        priceOutText: 18,
+        priceOutImage: 18,
+        priceOutVideo: 18,
+        priceOutAudio: 18,
+
         gsuCapacity: 500, // Est
 
         longContextConfig: {
@@ -60,8 +84,15 @@ export const GEMINI_MODELS: ModelConstraints[] = [
             burnOutImage: 1,
             burnOutVideo: 1,
             burnOutAudio: 1,
-            paygoInputPrice: 4,
-            paygoOutputPrice: 12
+
+            priceInText: 4,
+            priceInImage: 4,
+            priceInVideo: 4,
+            priceInAudio: 4,
+            priceOutText: 18,
+            priceOutImage: 18,
+            priceOutVideo: 18,
+            priceOutAudio: 18
         }
     },
 
@@ -78,8 +109,15 @@ export const GEMINI_MODELS: ModelConstraints[] = [
         burnOutVideo: 1,
         burnOutAudio: 1,
 
-        paygoInputPrice: 1.25,
-        paygoOutputPrice: 3.75,
+        priceInText: 1.25,
+        priceInImage: 1.25,
+        priceInVideo: 1.25,
+        priceInAudio: 1.25,
+        priceOutText: 10,
+        priceOutImage: 10,
+        priceOutVideo: 10,
+        priceOutAudio: 10,
+
         gsuCapacity: 200, // Est
 
         longContextConfig: {
@@ -92,8 +130,15 @@ export const GEMINI_MODELS: ModelConstraints[] = [
             burnOutImage: 1,
             burnOutVideo: 1,
             burnOutAudio: 1,
-            paygoInputPrice: 2.50,
-            paygoOutputPrice: 7.50
+
+            priceInText: 2.50,
+            priceInImage: 2.50,
+            priceInVideo: 2.50,
+            priceInAudio: 2.50,
+            priceOutText: 15, // Adjusted to match user recent edit intent for long context? (User changed short to 10, long was 7.5->15 in recent edit)
+            priceOutImage: 15,
+            priceOutVideo: 15,
+            priceOutAudio: 15
         }
     },
     {
@@ -108,9 +153,16 @@ export const GEMINI_MODELS: ModelConstraints[] = [
         burnOutVideo: 1,
         burnOutAudio: 1,
 
-        paygoInputPrice: 0.075,
-        paygoOutputPrice: 0.30,
-        gsuCapacity: 1000 // Est
+        priceInText: 0.075,
+        priceInImage: 0.075,
+        priceInVideo: 0.075,
+        priceInAudio: 0.075,
+        priceOutText: 0.30,
+        priceOutImage: 0.30,
+        priceOutVideo: 0.30,
+        priceOutAudio: 0.30,
+
+        gsuCapacity: 1000
     },
     {
         id: 'gemini-2-5-flash-image',
@@ -124,8 +176,14 @@ export const GEMINI_MODELS: ModelConstraints[] = [
         burnOutVideo: 1,
         burnOutAudio: 1,
 
-        paygoInputPrice: 0.10, // Est
-        paygoOutputPrice: 0.40,
+        priceInText: 0.10,
+        priceInImage: 0.10,
+        priceInVideo: 0.10,
+        priceInAudio: 0.10,
+        priceOutText: 0.40,
+        priceOutImage: 0.40,
+        priceOutVideo: 0.40,
+        priceOutAudio: 0.40,
         gsuCapacity: 1000
     }
 ];
