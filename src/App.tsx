@@ -42,25 +42,6 @@ const App: React.FC = () => {
   const [burnOutAudio, setBurnOutAudio] = useState(currentModel.burnOutAudio);
   const [burnOutVideo, setBurnOutVideo] = useState(currentModel.burnOutVideo);
 
-  // Effect to update burndown AND pricing AND capacity when model changes
-  React.useEffect(() => {
-    const model = GEMINI_MODELS.find(m => m.id === selectedModelId);
-    if (model) {
-      setBurnInText(model.burnInText);
-      setBurnInImage(model.burnInImage);
-      setBurnInVideo(model.burnInVideo);
-      setBurnInAudio(model.burnInAudio);
-
-      setBurnOutText(model.burnOutText);
-      setBurnOutImage(model.burnOutImage);
-      setBurnOutVideo(model.burnOutVideo);
-      setBurnOutAudio(model.burnOutAudio);
-
-      setPaygoInputPrice(model.paygoInputPrice);
-      setPaygoOutputPrice(model.paygoOutputPrice);
-      setGsuCapacity(model.gsuCapacity);
-    }
-  }, [selectedModelId]);
   const [tpsInText, setTpsInText] = useState(8000);
   const [tpsInImage, setTpsInImage] = useState(0);
   const [tpsInVideo, setTpsInVideo] = useState(0);
@@ -72,6 +53,36 @@ const App: React.FC = () => {
   const [tpsOutAudio, setTpsOutAudio] = useState(0);
   const [peakHours, setPeakHours] = useState(10);
   const [offPeakRatio, setOffPeakRatio] = useState(10);
+
+  // Calculate total input volume to check against context window threshold
+  // We sum up the "TPS" values as a proxy for total input tokens in the request
+  const totalInputTps = tpsInText + tpsInImage + tpsInVideo + tpsInAudio;
+
+  // Effect to update burndown AND pricing AND capacity when model changes OR when totalInputTps changes context
+  React.useEffect(() => {
+    const model = GEMINI_MODELS.find(m => m.id === selectedModelId);
+    if (model) {
+      let config = model;
+      // Check for Long Context Override based on TOTAL INPUT VOLUME
+      if (model.longContextConfig && totalInputTps > model.longContextConfig.threshold) {
+        config = { ...model, ...model.longContextConfig };
+      }
+
+      setBurnInText(config.burnInText);
+      setBurnInImage(config.burnInImage);
+      setBurnInVideo(config.burnInVideo);
+      setBurnInAudio(config.burnInAudio);
+
+      setBurnOutText(config.burnOutText);
+      setBurnOutImage(config.burnOutImage);
+      setBurnOutVideo(config.burnOutVideo);
+      setBurnOutAudio(config.burnOutAudio);
+
+      setPaygoInputPrice(config.paygoInputPrice);
+      setPaygoOutputPrice(config.paygoOutputPrice);
+      setGsuCapacity(config.gsuCapacity);
+    }
+  }, [selectedModelId, totalInputTps]);
 
   // --- CALCULATIONS ---
   const results = useMemo(() => {
@@ -183,6 +194,8 @@ const App: React.FC = () => {
   const formatCurrency = (val: number) =>
     new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
 
+  const isLongContext = currentModel.longContextConfig && totalInputTps > currentModel.longContextConfig.threshold;
+
   return (
     <div className="min-h-screen font-sans text-slate-600 relative overflow-hidden">
       <Background3DDefault />
@@ -247,12 +260,15 @@ const App: React.FC = () => {
                 {/* Info snippet for selected model */}
                 <div className="mt-3 ml-1 text-[10px] text-slate-400 font-medium uppercase tracking-wide space-y-1">
                   {/* Simplified info for multimodal - maybe just pricing? */}
-                  <div className="flex gap-4">
-                    <span>Input $: <span className="text-slate-600 font-bold">${currentModel.paygoInputPrice}</span></span>
-                    <span>Output $: <span className="text-slate-600 font-bold">${currentModel.paygoOutputPrice}</span></span>
+                  <div className="flex gap-4 items-center">
+                    <span>Input $: <span className="text-slate-600 font-bold">${paygoInputPrice}</span></span>
+                    <span>Output $: <span className="text-slate-600 font-bold">${paygoOutputPrice}</span></span>
+                    {isLongContext && <span className="bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded text-[9px] border border-indigo-200">LONG CONTEXT ACTIVE</span>}
                   </div>
                 </div>
               </div>
+
+              {/* AVG INPUT TOKENS Control REMOVED - using totalInputTps from multimodal inputs instead */}
 
               <div className="p-6 space-y-8 pt-4">
                 <div className="space-y-4">

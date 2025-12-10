@@ -15,6 +15,21 @@ export interface ModelConstraints {
     paygoInputPrice: number;
     paygoOutputPrice: number;
     gsuCapacity: number;
+
+    // Optional override for Long Context
+    longContextConfig?: {
+        threshold: number; // e.g. 200000
+        burnInText: number;
+        burnInImage: number;
+        burnInVideo: number;
+        burnInAudio: number;
+        burnOutText: number;
+        burnOutImage: number;
+        burnOutVideo: number;
+        burnOutAudio: number;
+        paygoInputPrice: number;
+        paygoOutputPrice: number;
+    }
 }
 
 export const GEMINI_MODELS: ModelConstraints[] = [
@@ -33,23 +48,21 @@ export const GEMINI_MODELS: ModelConstraints[] = [
 
         paygoInputPrice: 2, // Placeholder/Est
         paygoOutputPrice: 12, // Placeholder/Est
-        gsuCapacity: 500 // Est
-    },
-    {
-        id: 'gemini-3-pro-long',
-        name: 'Gemini 3.0 Pro (Long Context >200k)',
-        burnInText: 2.0,
-        burnInImage: 2.0,
-        burnInVideo: 2.0,
-        burnInAudio: 2.0,
-        burnOutText: 9.0,
-        burnOutImage: 1,
-        burnOutVideo: 1,
-        burnOutAudio: 1,
+        gsuCapacity: 500, // Est
 
-        paygoInputPrice: 4, // Est
-        paygoOutputPrice: 12, // Est
-        gsuCapacity: 500
+        longContextConfig: {
+            threshold: 200000,
+            burnInText: 2.0,
+            burnInImage: 2.0,
+            burnInVideo: 2.0,
+            burnInAudio: 2.0,
+            burnOutText: 9.0,
+            burnOutImage: 1,
+            burnOutVideo: 1,
+            burnOutAudio: 1,
+            paygoInputPrice: 4,
+            paygoOutputPrice: 12
+        }
     },
 
     // --- GEMINI 2.5 ---
@@ -67,23 +80,21 @@ export const GEMINI_MODELS: ModelConstraints[] = [
 
         paygoInputPrice: 1.25,
         paygoOutputPrice: 3.75,
-        gsuCapacity: 200 // Est
-    },
-    {
-        id: 'gemini-2-5-pro-long',
-        name: 'Gemini 2.5 Pro (Long Context >200k)',
-        burnInText: 2.0,
-        burnInImage: 2.0,
-        burnInVideo: 2.0,
-        burnInAudio: 2.0,
-        burnOutText: 12.0,
-        burnOutImage: 1,
-        burnOutVideo: 1,
-        burnOutAudio: 1,
+        gsuCapacity: 200, // Est
 
-        paygoInputPrice: 2.50,
-        paygoOutputPrice: 7.50,
-        gsuCapacity: 200
+        longContextConfig: {
+            threshold: 200000,
+            burnInText: 2.0,
+            burnInImage: 2.0,
+            burnInVideo: 2.0,
+            burnInAudio: 2.0,
+            burnOutText: 12.0,
+            burnOutImage: 1,
+            burnOutVideo: 1,
+            burnOutAudio: 1,
+            paygoInputPrice: 2.50,
+            paygoOutputPrice: 7.50
+        }
     },
     {
         id: 'gemini-2-5-flash',
@@ -116,7 +127,7 @@ export const GEMINI_MODELS: ModelConstraints[] = [
         paygoInputPrice: 0.10, // Est
         paygoOutputPrice: 0.40,
         gsuCapacity: 1000
-    },
+    }
 ];
 
 export const DEFAULT_MODEL_ID = 'gemini-3-pro';
