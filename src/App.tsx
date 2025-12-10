@@ -4,7 +4,7 @@ import {
   ComposedChart, Bar, Line, Cell, Label, ReferenceDot
 } from 'recharts';
 import {
-  Settings, Zap, TrendingUp, Cloud, Server, Clock, Box, ChevronDown
+  Settings, Zap, TrendingUp, Cloud, Server, Clock, Box, ChevronDown, Info
 } from 'lucide-react';
 import Background3DDefault from './components/Background3D';
 import { GEMINI_MODELS, DEFAULT_MODEL_ID, PT_PRICING } from './data/models';
@@ -143,32 +143,23 @@ const App: React.FC = () => {
     // We also sanitize price to 0 if it is -1 (unsupported flag).
     const safePrice = (p: number) => Math.max(0, p);
 
-    // Text: burnInText is usually 1.0, but we include it for completeness.
-    const costInText = ((tpsInText * burnInText * secondsPeak) + (tpsInText * burnInText * ratioDecimal * secondsOffPeak)) / 1e6 * safePrice(priceInText);
+    // Text: Raw unit volume * Price (Per 1 Million Units)
+    const costInText = ((tpsInText * secondsPeak) + (tpsInText * ratioDecimal * secondsOffPeak)) / 1e6 * safePrice(priceInText);
 
-    // Image: burnInImage (e.g. 258) converts Images -> Tokens.
-    const costInImage = ((tpsInImage * burnInImage * secondsPeak) + (tpsInImage * burnInImage * ratioDecimal * secondsOffPeak)) / 1e6 * safePrice(priceInImage);
+    // Image: Raw unit volume * Price (Per 1 Million Images)
+    const costInImage = ((tpsInImage * secondsPeak) + (tpsInImage * ratioDecimal * secondsOffPeak)) / 1e6 * safePrice(priceInImage);
 
-    // Video: burnInVideo converts Video Units -> Tokens.
-    const costInVideo = ((tpsInVideo * burnInVideo * secondsPeak) + (tpsInVideo * burnInVideo * ratioDecimal * secondsOffPeak)) / 1e6 * safePrice(priceInVideo);
+    // Video: Raw unit volume * Price (Per 1 Million Video Units/Seconds)
+    const costInVideo = ((tpsInVideo * secondsPeak) + (tpsInVideo * ratioDecimal * secondsOffPeak)) / 1e6 * safePrice(priceInVideo);
 
-    // Audio: burnInAudio converts Audio Units -> Tokens.
-    const costInAudio = ((tpsInAudio * burnInAudio * secondsPeak) + (tpsInAudio * burnInAudio * ratioDecimal * secondsOffPeak)) / 1e6 * safePrice(priceInAudio);
+    // Audio: Raw unit volume * Price (Per 1 Million Audio Units/Seconds)
+    const costInAudio = ((tpsInAudio * secondsPeak) + (tpsInAudio * ratioDecimal * secondsOffPeak)) / 1e6 * safePrice(priceInAudio);
 
     // OUTPUTS
-    // Text Output: Billed 1:1 with tokens. We use 1.0, NOT burnOutText (which is for capacity).
-    const costOutText = ((tpsOutText * 1.0 * secondsPeak) + (tpsOutText * 1.0 * ratioDecimal * secondsOffPeak)) / 1e6 * safePrice(priceOutText);
-
-    // Image Output: If price is per 1M images (e.g. Generation), we use 1.0 (assuming price is per Image unit).
-    // IF price is per Token, we use burnOutImage.
-    // Given the ambiguity, usually Image Gen is priced per image. 
-    // BUT the user Defaults (~$15/1M) imply Token Pricing. 
-    // FOR SAFETY: I'll use burnOutImage as the multiplier here, assuming consistent "Token" abstraction.
-    // (If burnOutImage is 100 for Gen, then 100 tokens * price).
-    const costOutImage = ((tpsOutImage * burnOutImage * secondsPeak) + (tpsOutImage * burnOutImage * ratioDecimal * secondsOffPeak)) / 1e6 * safePrice(priceOutImage);
-
-    const costOutVideo = ((tpsOutVideo * burnOutVideo * secondsPeak) + (tpsOutVideo * burnOutVideo * ratioDecimal * secondsOffPeak)) / 1e6 * safePrice(priceOutVideo);
-    const costOutAudio = ((tpsOutAudio * burnOutAudio * secondsPeak) + (tpsOutAudio * burnOutAudio * ratioDecimal * secondsOffPeak)) / 1e6 * safePrice(priceOutAudio);
+    const costOutText = ((tpsOutText * secondsPeak) + (tpsOutText * ratioDecimal * secondsOffPeak)) / 1e6 * safePrice(priceOutText);
+    const costOutImage = ((tpsOutImage * secondsPeak) + (tpsOutImage * ratioDecimal * secondsOffPeak)) / 1e6 * safePrice(priceOutImage);
+    const costOutVideo = ((tpsOutVideo * secondsPeak) + (tpsOutVideo * ratioDecimal * secondsOffPeak)) / 1e6 * safePrice(priceOutVideo);
+    const costOutAudio = ((tpsOutAudio * secondsPeak) + (tpsOutAudio * ratioDecimal * secondsOffPeak)) / 1e6 * safePrice(priceOutAudio);
 
     const paygoCost = costInText + costInImage + costInVideo + costInAudio +
       costOutText + costOutImage + costOutVideo + costOutAudio;
@@ -183,7 +174,10 @@ const App: React.FC = () => {
 
     return {
       peakUnitsNeeded, gsusNeeded, paygoCost, ptMonthlyCost, ptQuarterlyCost, ptYearlyCost, avgUtilization, isPtCheaper, savings,
-      totalBurnIn, totalBurnOut // Exported for UI
+      totalBurnIn, totalBurnOut, // Exported for UI
+      // Detailed Costs for Tooltip
+      costInText, costInImage, costInVideo, costInAudio,
+      costOutText, costOutImage, costOutVideo, costOutAudio
     };
   }, [
     priceInText, priceInImage, priceInVideo, priceInAudio,
@@ -573,7 +567,13 @@ const App: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
-                  <TableRow label="Pay-as-you-go" cost={results.paygoCost} base={results.paygoCost} isBase />
+                  <TableRow
+                    label="Pay-as-you-go"
+                    cost={results.paygoCost}
+                    base={results.paygoCost}
+                    isBase
+                    details={results} // Pass all results for the tooltip breakdown
+                  />
                   <TableRow label="PT (Monthly Commit)" cost={results.ptMonthlyCost} base={results.paygoCost} />
                   <TableRow label="PT (3-Month Commit)" cost={results.ptQuarterlyCost} base={results.paygoCost} />
                   <TableRow label="PT (1-Year Commit)" cost={results.ptYearlyCost} base={results.paygoCost} highlight />
@@ -680,13 +680,45 @@ const MetricCard = ({ title, value, unit, desc, icon, color = "text-slate-900" }
   </div>
 );
 
-const TableRow = ({ label, cost, base, isBase, highlight }: any) => {
+const TableRow = ({ label, cost, base, isBase, highlight, details }: any) => {
   const diff = cost - base;
   const percent = (diff / base) * 100;
   const isCheaper = diff < 0;
+
   return (
     <tr className={`group transition-colors ${highlight ? 'bg-indigo-50/30' : 'hover:bg-slate-50'}`}>
-      <td className={`px-6 py-4 text-sm font-medium ${highlight ? 'text-indigo-900' : 'text-slate-700'}`}>{label}</td>
+      <td className={`px-6 py-4 text-sm font-medium ${highlight ? 'text-indigo-900' : 'text-slate-700'}`}>
+        <div className="flex items-center gap-2 relative">
+          {label}
+          {details && (
+            <div className="group/info relative">
+              <Info className="w-3.5 h-3.5 text-slate-300 cursor-help hover:text-indigo-500 transition-colors" />
+              {/* TOOLTIP POPUP */}
+              <div className="absolute left-6 top-1/2 -translate-y-1/2 w-64 bg-slate-900 text-white p-4 rounded-xl shadow-xl z-50 opacity-0 invisible group-hover/info:opacity-100 group-hover/info:visible transition-all duration-200 pointer-events-none">
+                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 border-b border-slate-700 pb-2">
+                  Calculation Logic
+                </div>
+                <div className="space-y-1.5 text-xs">
+                  {details.costInText > 0 && <div className="flex justify-between"><span>Text In:</span> <span className="font-mono text-emerald-300">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(details.costInText)}</span></div>}
+                  {details.costInImage > 0 && <div className="flex justify-between"><span>Image In:</span> <span className="font-mono text-emerald-300">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(details.costInImage)}</span></div>}
+                  {details.costInVideo > 0 && <div className="flex justify-between"><span>Video In:</span> <span className="font-mono text-emerald-300">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(details.costInVideo)}</span></div>}
+                  {details.costInAudio > 0 && <div className="flex justify-between"><span>Audio In:</span> <span className="font-mono text-emerald-300">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(details.costInAudio)}</span></div>}
+
+                  {(details.costInText > 0 || details.costInImage > 0) && (details.costOutText > 0 || details.costOutImage > 0) && <div className="border-t border-slate-700 my-1"></div>}
+
+                  {details.costOutText > 0 && <div className="flex justify-between"><span>Text Out:</span> <span className="font-mono text-indigo-300">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(details.costOutText)}</span></div>}
+                  {details.costOutImage > 0 && <div className="flex justify-between"><span>Image Out:</span> <span className="font-mono text-indigo-300">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(details.costOutImage)}</span></div>}
+                  {details.costOutVideo > 0 && <div className="flex justify-between"><span>Video Out:</span> <span className="font-mono text-indigo-300">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(details.costOutVideo)}</span></div>}
+                  {details.costOutAudio > 0 && <div className="flex justify-between"><span>Audio Out:</span> <span className="font-mono text-indigo-300">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(details.costOutAudio)}</span></div>}
+                </div>
+                <div className="mt-3 text-[9px] text-slate-500 italic leading-tight">
+                  Annual Sum of (TPS × UsageTime / 1M) × Price
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </td>
       <td className="px-6 py-4 text-sm font-mono text-right text-slate-600">
         {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(cost / 12)}
       </td>
