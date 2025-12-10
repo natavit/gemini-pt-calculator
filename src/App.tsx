@@ -139,15 +139,36 @@ const App: React.FC = () => {
     // If user enters $ amount for 1M images, this holds. 
 
     // Cost = (AnnualUnits / 1,000,000) * PricePerMillion
-    const costInText = ((tpsInText * secondsPeak) + (tpsInText * ratioDecimal * secondsOffPeak)) / 1e6 * priceInText;
-    const costInImage = ((tpsInImage * secondsPeak) + (tpsInImage * ratioDecimal * secondsOffPeak)) / 1e6 * priceInImage;
-    const costInVideo = ((tpsInVideo * secondsPeak) + (tpsInVideo * ratioDecimal * secondsOffPeak)) / 1e6 * priceInVideo;
-    const costInAudio = ((tpsInAudio * secondsPeak) + (tpsInAudio * ratioDecimal * secondsOffPeak)) / 1e6 * priceInAudio;
+    // We multiply TPS by burnInX to estimate the "Token Equivalent" volume before applying price.
+    // We also sanitize price to 0 if it is -1 (unsupported flag).
+    const safePrice = (p: number) => Math.max(0, p);
 
-    const costOutText = ((tpsOutText * secondsPeak * 1.0) + (tpsOutText * ratioDecimal * secondsOffPeak * 1.0)) / 1e6 * priceOutText; // 1.0 multiplier for text billing
-    const costOutImage = ((tpsOutImage * secondsPeak) + (tpsOutImage * ratioDecimal * secondsOffPeak)) / 1e6 * priceOutImage;
-    const costOutVideo = ((tpsOutVideo * secondsPeak) + (tpsOutVideo * ratioDecimal * secondsOffPeak)) / 1e6 * priceOutVideo;
-    const costOutAudio = ((tpsOutAudio * secondsPeak) + (tpsOutAudio * ratioDecimal * secondsOffPeak)) / 1e6 * priceOutAudio;
+    // Text: burnInText is usually 1.0, but we include it for completeness.
+    const costInText = ((tpsInText * burnInText * secondsPeak) + (tpsInText * burnInText * ratioDecimal * secondsOffPeak)) / 1e6 * safePrice(priceInText);
+
+    // Image: burnInImage (e.g. 258) converts Images -> Tokens.
+    const costInImage = ((tpsInImage * burnInImage * secondsPeak) + (tpsInImage * burnInImage * ratioDecimal * secondsOffPeak)) / 1e6 * safePrice(priceInImage);
+
+    // Video: burnInVideo converts Video Units -> Tokens.
+    const costInVideo = ((tpsInVideo * burnInVideo * secondsPeak) + (tpsInVideo * burnInVideo * ratioDecimal * secondsOffPeak)) / 1e6 * safePrice(priceInVideo);
+
+    // Audio: burnInAudio converts Audio Units -> Tokens.
+    const costInAudio = ((tpsInAudio * burnInAudio * secondsPeak) + (tpsInAudio * burnInAudio * ratioDecimal * secondsOffPeak)) / 1e6 * safePrice(priceInAudio);
+
+    // OUTPUTS
+    // Text Output: Billed 1:1 with tokens. We use 1.0, NOT burnOutText (which is for capacity).
+    const costOutText = ((tpsOutText * 1.0 * secondsPeak) + (tpsOutText * 1.0 * ratioDecimal * secondsOffPeak)) / 1e6 * safePrice(priceOutText);
+
+    // Image Output: If price is per 1M images (e.g. Generation), we use 1.0 (assuming price is per Image unit).
+    // IF price is per Token, we use burnOutImage.
+    // Given the ambiguity, usually Image Gen is priced per image. 
+    // BUT the user Defaults (~$15/1M) imply Token Pricing. 
+    // FOR SAFETY: I'll use burnOutImage as the multiplier here, assuming consistent "Token" abstraction.
+    // (If burnOutImage is 100 for Gen, then 100 tokens * price).
+    const costOutImage = ((tpsOutImage * burnOutImage * secondsPeak) + (tpsOutImage * burnOutImage * ratioDecimal * secondsOffPeak)) / 1e6 * safePrice(priceOutImage);
+
+    const costOutVideo = ((tpsOutVideo * burnOutVideo * secondsPeak) + (tpsOutVideo * burnOutVideo * ratioDecimal * secondsOffPeak)) / 1e6 * safePrice(priceOutVideo);
+    const costOutAudio = ((tpsOutAudio * burnOutAudio * secondsPeak) + (tpsOutAudio * burnOutAudio * ratioDecimal * secondsOffPeak)) / 1e6 * safePrice(priceOutAudio);
 
     const paygoCost = costInText + costInImage + costInVideo + costInAudio +
       costOutText + costOutImage + costOutVideo + costOutAudio;
@@ -309,19 +330,19 @@ const App: React.FC = () => {
                         <label className="block text-xs font-bold text-slate-500 mb-2 uppercase">Multimodal Inputs (TPS)</label>
                         <div className="grid grid-cols-2 gap-3">
                           <div>
-                            <NumberInput label="Text" value={tpsInText} setValue={setTpsInText} step={100} />
+                            <NumberInput label="Text" value={tpsInText} setValue={setTpsInText} step={100} disabled={priceInText === -1} />
                             <div className="text-[10px] text-right text-slate-400 mt-1">{burnInText}x = <span className="text-indigo-500 font-mono">{(tpsInText * burnInText).toLocaleString()}</span></div>
                           </div>
                           <div>
-                            <NumberInput label="Image" value={tpsInImage} setValue={setTpsInImage} step={1} />
+                            <NumberInput label="Image" value={tpsInImage} setValue={setTpsInImage} step={1} disabled={priceInImage === -1} />
                             <div className="text-[10px] text-right text-slate-400 mt-1">{burnInImage}x = <span className="text-indigo-500 font-mono">{(tpsInImage * burnInImage).toLocaleString()}</span></div>
                           </div>
                           <div>
-                            <NumberInput label="Video" value={tpsInVideo} setValue={setTpsInVideo} step={1} />
+                            <NumberInput label="Video" value={tpsInVideo} setValue={setTpsInVideo} step={1} disabled={priceInVideo === -1} />
                             <div className="text-[10px] text-right text-slate-400 mt-1">{burnInVideo}x = <span className="text-indigo-500 font-mono">{(tpsInVideo * burnInVideo).toLocaleString()}</span></div>
                           </div>
                           <div>
-                            <NumberInput label="Audio" value={tpsInAudio} setValue={setTpsInAudio} step={1} />
+                            <NumberInput label="Audio" value={tpsInAudio} setValue={setTpsInAudio} step={1} disabled={priceInAudio === -1} />
                             <div className="text-[10px] text-right text-slate-400 mt-1">{burnInAudio}x = <span className="text-indigo-500 font-mono">{(tpsInAudio * burnInAudio).toLocaleString()}</span></div>
                           </div>
                         </div>
@@ -331,19 +352,19 @@ const App: React.FC = () => {
                         <label className="block text-xs font-bold text-slate-500 mb-2 uppercase">Multimodal Outputs (TPS)</label>
                         <div className="grid grid-cols-2 gap-3">
                           <div>
-                            <NumberInput label="Text" value={tpsOutText} setValue={setTpsOutText} step={10} />
+                            <NumberInput label="Text" value={tpsOutText} setValue={setTpsOutText} step={10} disabled={priceOutText === -1} />
                             <div className="text-[10px] text-right text-slate-400 mt-1">{burnOutText}x = <span className="text-indigo-500 font-mono">{(tpsOutText * burnOutText).toLocaleString()}</span></div>
                           </div>
                           <div>
-                            <NumberInput label="Image" value={tpsOutImage} setValue={setTpsOutImage} step={1} />
+                            <NumberInput label="Image" value={tpsOutImage} setValue={setTpsOutImage} step={1} disabled={priceOutImage === -1} />
                             <div className="text-[10px] text-right text-slate-400 mt-1">{burnOutImage}x = <span className="text-indigo-500 font-mono">{(tpsOutImage * burnOutImage).toLocaleString()}</span></div>
                           </div>
                           <div>
-                            <NumberInput label="Video" value={tpsOutVideo} setValue={setTpsOutVideo} step={1} />
+                            <NumberInput label="Video" value={tpsOutVideo} setValue={setTpsOutVideo} step={1} disabled={priceOutVideo === -1} />
                             <div className="text-[10px] text-right text-slate-400 mt-1">{burnOutVideo}x = <span className="text-indigo-500 font-mono">{(tpsOutVideo * burnOutVideo).toLocaleString()}</span></div>
                           </div>
                           <div>
-                            <NumberInput label="Audio" value={tpsOutAudio} setValue={setTpsOutAudio} step={1} />
+                            <NumberInput label="Audio" value={tpsOutAudio} setValue={setTpsOutAudio} step={1} disabled={priceOutAudio === -1} />
                             <div className="text-[10px] text-right text-slate-400 mt-1">{burnOutAudio}x = <span className="text-indigo-500 font-mono">{(tpsOutAudio * burnOutAudio).toLocaleString()}</span></div>
                           </div>
                         </div>
@@ -378,17 +399,17 @@ const App: React.FC = () => {
                   <div className="grid grid-cols-2 gap-x-8 gap-y-4">
                     <div className="space-y-2">
                       <div className="text-[10px] text-slate-400 uppercase font-semibold border-b border-slate-50 pb-1 mb-1">Inputs</div>
-                      <PriceInput label="Text In" value={priceInText} setValue={setPriceInText} />
-                      {tpsInImage > 0 && <PriceInput label="Image In" value={priceInImage} setValue={setPriceInImage} />}
-                      {tpsInVideo > 0 && <PriceInput label="Video In" value={priceInVideo} setValue={setPriceInVideo} />}
-                      {tpsInAudio > 0 && <PriceInput label="Audio In" value={priceInAudio} setValue={setPriceInAudio} />}
+                      {priceInText !== -1 && <PriceInput label="Text In" value={priceInText} setValue={setPriceInText} />}
+                      {priceInImage !== -1 && tpsInImage > 0 && <PriceInput label="Image In" value={priceInImage} setValue={setPriceInImage} />}
+                      {priceInVideo !== -1 && tpsInVideo > 0 && <PriceInput label="Video In" value={priceInVideo} setValue={setPriceInVideo} />}
+                      {priceInAudio !== -1 && tpsInAudio > 0 && <PriceInput label="Audio In" value={priceInAudio} setValue={setPriceInAudio} />}
                     </div>
                     <div className="space-y-2">
                       <div className="text-[10px] text-slate-400 uppercase font-semibold border-b border-slate-50 pb-1 mb-1">Outputs</div>
-                      <PriceInput label="Text Out" value={priceOutText} setValue={setPriceOutText} />
-                      {tpsOutImage > 0 && <PriceInput label="Image Out" value={priceOutImage} setValue={setPriceOutImage} />}
-                      {tpsOutVideo > 0 && <PriceInput label="Video Out" value={priceOutVideo} setValue={setPriceOutVideo} />}
-                      {tpsOutAudio > 0 && <PriceInput label="Audio Out" value={priceOutAudio} setValue={setPriceOutAudio} />}
+                      {priceOutText !== -1 && <PriceInput label="Text Out" value={priceOutText} setValue={setPriceOutText} />}
+                      {priceOutImage !== -1 && tpsOutImage > 0 && <PriceInput label="Image Out" value={priceOutImage} setValue={setPriceOutImage} />}
+                      {priceOutVideo !== -1 && tpsOutVideo > 0 && <PriceInput label="Video Out" value={priceOutVideo} setValue={setPriceOutVideo} />}
+                      {priceOutAudio !== -1 && tpsOutAudio > 0 && <PriceInput label="Audio Out" value={priceOutAudio} setValue={setPriceOutAudio} />}
                     </div>
                   </div>
                 </div>
@@ -569,7 +590,7 @@ const App: React.FC = () => {
 
 // --- SUBCOMPONENTS ---
 
-const NumberInput = ({ label, value, setValue, step }: any) => {
+const NumberInput = ({ label, value, setValue, step, disabled }: any) => {
   const [localValue, setLocalValue] = React.useState(value.toString());
 
   // Sync local value with prop value if they diverge significantly (e.g. external update)
@@ -601,7 +622,7 @@ const NumberInput = ({ label, value, setValue, step }: any) => {
   };
 
   return (
-    <div>
+    <div className={disabled ? "opacity-40 pointer-events-none grayscale" : ""}>
       <label className="block text-xs font-semibold text-slate-500 mb-1.5 ml-1">{label}</label>
       <div className="relative group">
         <input
@@ -610,7 +631,8 @@ const NumberInput = ({ label, value, setValue, step }: any) => {
           onChange={handleChange}
           onBlur={handleBlur}
           step={step}
-          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-medium focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all group-hover:bg-slate-100"
+          disabled={disabled}
+          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-medium focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all group-hover:bg-slate-100 disabled:bg-slate-100"
         />
         <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-400 text-xs font-bold">TPS</div>
       </div>

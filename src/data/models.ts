@@ -67,10 +67,10 @@ export const GEMINI_MODELS: ModelConstraints[] = [
         priceInImage: 2,
         priceInVideo: 2,
         priceInAudio: 2,
-        priceOutText: 18,
-        priceOutImage: 18,
-        priceOutVideo: 18,
-        priceOutAudio: 18,
+        priceOutText: 12,
+        priceOutImage: -1,
+        priceOutVideo: -1,
+        priceOutAudio: -1,
 
         gsuCapacity: 500, // Est
 
@@ -90,9 +90,9 @@ export const GEMINI_MODELS: ModelConstraints[] = [
             priceInVideo: 4,
             priceInAudio: 4,
             priceOutText: 18,
-            priceOutImage: 18,
-            priceOutVideo: 18,
-            priceOutAudio: 18
+            priceOutImage: -1,
+            priceOutVideo: -1,
+            priceOutAudio: -1
         }
     },
 
@@ -114,9 +114,9 @@ export const GEMINI_MODELS: ModelConstraints[] = [
         priceInVideo: 1.25,
         priceInAudio: 1.25,
         priceOutText: 10,
-        priceOutImage: 10,
-        priceOutVideo: 10,
-        priceOutAudio: 10,
+        priceOutImage: -1,
+        priceOutVideo: -1,
+        priceOutAudio: -1,
 
         gsuCapacity: 200, // Est
 
@@ -136,9 +136,9 @@ export const GEMINI_MODELS: ModelConstraints[] = [
             priceInVideo: 2.50,
             priceInAudio: 2.50,
             priceOutText: 15, // Adjusted to match user recent edit intent for long context? (User changed short to 10, long was 7.5->15 in recent edit)
-            priceOutImage: 15,
-            priceOutVideo: 15,
-            priceOutAudio: 15
+            priceOutImage: -1,
+            priceOutVideo: -1,
+            priceOutAudio: -1
         }
     },
     {
