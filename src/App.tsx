@@ -4,7 +4,7 @@ import {
   ComposedChart, Bar, Line, Cell, Label, ReferenceDot
 } from 'recharts';
 import {
-  Settings, Zap, TrendingUp, Cloud, Server, Clock, Box, ChevronDown, Info
+  Settings, Zap, TrendingUp, Cloud, Server, Clock, Box, ChevronDown, Check, Info
 } from 'lucide-react';
 import Background3DDefault from './components/Background3D';
 import { GEMINI_MODELS, DEFAULT_MODEL_ID, PT_PRICING } from './data/models';
@@ -279,29 +279,14 @@ const App: React.FC = () => {
               </div>
 
               {/* MODEL SELECTOR */}
-              <div className="px-6 pt-6 pb-2">
+              <div className="px-6 pt-6 pb-2 relative z-20">
                 <label className="block text-xs font-semibold text-slate-500 mb-1.5 ml-1">Model Version</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-indigo-500">
-                    <Box size={18} />
-                  </div>
-                  <select
-                    value={selectedModelId}
-                    onChange={(e) => setSelectedModelId(e.target.value)}
-                    className="w-full appearance-none bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-10 py-3 text-slate-900 font-medium focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all cursor-pointer hover:bg-slate-100"
-                  >
-                    {GEMINI_MODELS.map(model => (
-                      <option key={model.id} value={model.id}>
-                        {model.name}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-400">
-                    <ChevronDown size={16} />
-                  </div>
-                </div>
-                {/* Info snippet for selected model */}
-                {/* Info snippet for selected model */}
+                <ModelSelector
+                  models={GEMINI_MODELS}
+                  selectedId={selectedModelId}
+                  onSelect={setSelectedModelId}
+                />
+
                 {/* Info snippet for selected model */}
                 <div className="mt-3 ml-1 text-[10px] text-slate-400 font-medium uppercase tracking-wide space-y-1">
                   {/* Simplified info for multimodal - maybe just pricing? */}
@@ -389,32 +374,30 @@ const App: React.FC = () => {
               <div className="p-6">
                 {/* Granular Pricing Grid */}
                 <div className="mb-6">
-                  <h4 className="text-xs font-bold text-slate-400 mb-3 uppercase tracking-wide">PayGo Rates ($/1M)</h4>
+                  <h4 className="text-xs font-bold text-slate-400 mb-3 uppercase tracking-wide">PayGo Rates ($/1M Tokens)</h4>
                   <div className="grid grid-cols-2 gap-x-8 gap-y-4">
                     <div className="space-y-2">
                       <div className="text-[10px] text-slate-400 uppercase font-semibold border-b border-slate-50 pb-1 mb-1">Inputs</div>
                       {priceInText !== -1 && <PriceInput label="Text In" value={priceInText} setValue={setPriceInText} />}
-                      {priceInImage !== -1 && tpsInImage > 0 && <PriceInput label="Image In" value={priceInImage} setValue={setPriceInImage} />}
-                      {priceInVideo !== -1 && tpsInVideo > 0 && <PriceInput label="Video In" value={priceInVideo} setValue={setPriceInVideo} />}
-                      {priceInAudio !== -1 && tpsInAudio > 0 && <PriceInput label="Audio In" value={priceInAudio} setValue={setPriceInAudio} />}
+                      {priceInImage !== -1 && <PriceInput label="Image In" value={priceInImage} setValue={setPriceInImage} />}
+                      {priceInVideo !== -1 && <PriceInput label="Video In" value={priceInVideo} setValue={setPriceInVideo} />}
+                      {priceInAudio !== -1 && <PriceInput label="Audio In" value={priceInAudio} setValue={setPriceInAudio} />}
                     </div>
                     <div className="space-y-2">
                       <div className="text-[10px] text-slate-400 uppercase font-semibold border-b border-slate-50 pb-1 mb-1">Outputs</div>
                       {priceOutText !== -1 && <PriceInput label="Text Out" value={priceOutText} setValue={setPriceOutText} />}
-                      {priceOutImage !== -1 && tpsOutImage > 0 && <PriceInput label="Image Out" value={priceOutImage} setValue={setPriceOutImage} />}
-                      {priceOutVideo !== -1 && tpsOutVideo > 0 && <PriceInput label="Video Out" value={priceOutVideo} setValue={setPriceOutVideo} />}
-                      {priceOutAudio !== -1 && tpsOutAudio > 0 && <PriceInput label="Audio Out" value={priceOutAudio} setValue={setPriceOutAudio} />}
+                      {priceOutImage !== -1 && <PriceInput label="Image Out" value={priceOutImage} setValue={setPriceOutImage} />}
+                      {priceOutVideo !== -1 && <PriceInput label="Video Out" value={priceOutVideo} setValue={setPriceOutVideo} />}
+                      {priceOutAudio !== -1 && <PriceInput label="Audio Out" value={priceOutAudio} setValue={setPriceOutAudio} />}
                     </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="col-span-2 text-xs font-semibold text-slate-400 uppercase tracking-wide">PT Commit ($/GSU)</div>
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="col-span-1 text-xs font-semibold text-slate-400 uppercase tracking-wide">PT Commit ($/GSU)</div>
                   <PriceInput label="Monthly" value={ptMonthlyPrice} setValue={setPtMonthlyPrice} />
                   <PriceInput label="3-Month" value={ptQuarterlyPrice} setValue={setPtQuarterlyPrice} />
-                  <div className="col-span-2">
-                    <PriceInput label="1-Year" value={ptYearlyPrice} setValue={setPtYearlyPrice} />
-                  </div>
+                  <PriceInput label="1-Year" value={ptYearlyPrice} setValue={setPtYearlyPrice} />
                 </div>
 
                 <div className="mt-6 pt-4 border-t border-slate-100">
@@ -589,6 +572,65 @@ const App: React.FC = () => {
 };
 
 // --- SUBCOMPONENTS ---
+
+const ModelSelector = ({ models, selectedId, onSelect }: any) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const selectedModel = models.find((m: any) => m.id === selectedId) || models[0];
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+  // Click outside to close
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`w-full bg-slate-50 border border-slate-200 rounded-xl pl-4 pr-4 py-3 text-slate-900 font-medium flex items-center justify-between transition-all hover:bg-slate-100 hover:border-slate-300 focus:ring-2 focus:ring-indigo-500/20 active:scale-[0.99] ${isOpen ? 'ring-2 ring-indigo-500/20 border-indigo-500' : ''}`}
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-white shadow-sm border border-slate-100 flex items-center justify-center text-indigo-600">
+            <Box size={16} />
+          </div>
+          <span className="text-sm">{selectedModel.name}</span>
+        </div>
+        <ChevronDown size={16} className={`text-slate-400 transition-transform duration-300 ${isOpen ? 'top-0 rotate-180' : ''}`} />
+      </button>
+
+      {/* Dropdown Menu */}
+      <div className={`absolute left-0 right-0 top-full mt-2 bg-white rounded-xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden transform transition-all duration-200 origin-top z-50 ${isOpen ? 'opacity-100 scale-100 translate-y-0 visible' : 'opacity-0 scale-95 -translate-y-2 invisible'}`}>
+        <div className="p-1.5 space-y-0.5 max-h-[280px] overflow-y-auto">
+          {models.map((model: any) => {
+            const isActive = model.id === selectedId;
+            return (
+              <button
+                key={model.id}
+                onClick={() => {
+                  onSelect(model.id);
+                  setIsOpen(false);
+                }}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm text-left transition-colors ${isActive ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:bg-slate-50'}`}
+              >
+                <span className="flex items-center gap-2">
+                  <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-indigo-500' : 'bg-slate-300'}`}></span>
+                  {model.name}
+                </span>
+                {isActive && <Check size={14} className="text-indigo-600" />}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const NumberInput = ({ label, value, setValue, step, disabled }: any) => {
   const [localValue, setLocalValue] = React.useState(value.toString());

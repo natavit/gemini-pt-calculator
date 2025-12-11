@@ -52,8 +52,8 @@ export interface ModelConstraints {
 export const GEMINI_MODELS: ModelConstraints[] = [
     // --- GEMINI 3.0 ---
     {
-        id: 'gemini-3-pro',
-        name: 'Gemini 3.0 Pro',
+        id: 'gemini-3-pro-preview',
+        name: 'Gemini 3 Pro',
         burnInText: 1.0,
         burnInImage: 1.0,
         burnInVideo: 1.0,
@@ -96,6 +96,52 @@ export const GEMINI_MODELS: ModelConstraints[] = [
         }
     },
 
+    // --- GEMINI 3 Pro Image (Nano Banana Pro) ---
+    {
+        id: 'gemini-3-pro-image-preview',
+        name: 'Gemini 3 Pro Image (Nano Banana Pro)',
+        burnInText: 1.0,
+        burnInImage: 1.0,
+        burnInVideo: -1,
+        burnInAudio: -1,
+        burnOutText: 6.0,
+        burnOutImage: 60, // N/A
+        burnOutVideo: -1, // N/A
+        burnOutAudio: -1, // N/A
+
+        priceInText: 2,
+        priceInImage: 2,
+        priceInVideo: 2,
+        priceInAudio: 2,
+        priceOutText: 12,
+        priceOutImage: 120,
+        priceOutVideo: -1,
+        priceOutAudio: -1,
+
+        gsuCapacity: 500, // Est
+
+        longContextConfig: {
+            threshold: 200000,
+            burnInText: 2.0,
+            burnInImage: 2.0,
+            burnInVideo: 2.0,
+            burnInAudio: 2.0,
+            burnOutText: 9.0,
+            burnOutImage: 1,
+            burnOutVideo: 1,
+            burnOutAudio: 1,
+
+            priceInText: 4,
+            priceInImage: 4,
+            priceInVideo: 4,
+            priceInAudio: 4,
+            priceOutText: 18,
+            priceOutImage: 120,
+            priceOutVideo: -1,
+            priceOutAudio: -1
+        }
+    },
+
     // --- GEMINI 2.5 ---
     {
         id: 'gemini-2-5-pro',
@@ -106,8 +152,8 @@ export const GEMINI_MODELS: ModelConstraints[] = [
         burnInAudio: 1.0,
         burnOutText: 8.0,
         burnOutImage: 1,
-        burnOutVideo: 1,
-        burnOutAudio: 1,
+        burnOutVideo: -1,
+        burnOutAudio: -1,
 
         priceInText: 1.25,
         priceInImage: 1.25,
@@ -118,7 +164,7 @@ export const GEMINI_MODELS: ModelConstraints[] = [
         priceOutVideo: -1,
         priceOutAudio: -1,
 
-        gsuCapacity: 200, // Est
+        gsuCapacity: 650, // Est
 
         longContextConfig: {
             threshold: 200000,
@@ -127,9 +173,9 @@ export const GEMINI_MODELS: ModelConstraints[] = [
             burnInVideo: 2.0,
             burnInAudio: 2.0,
             burnOutText: 12.0,
-            burnOutImage: 1,
-            burnOutVideo: 1,
-            burnOutAudio: 1,
+            burnOutImage: -1,
+            burnOutVideo: -1,
+            burnOutAudio: -1,
 
             priceInText: 2.50,
             priceInImage: 2.50,
@@ -149,46 +195,89 @@ export const GEMINI_MODELS: ModelConstraints[] = [
         burnInVideo: 1.0,
         burnInAudio: 4.0, // Special rate!
         burnOutText: 9.0, // High output burn!
-        burnOutImage: 1,
-        burnOutVideo: 1,
-        burnOutAudio: 1,
+        burnOutImage: -1,
+        burnOutVideo: -1,
+        burnOutAudio: -1,
 
-        priceInText: 0.075,
-        priceInImage: 0.075,
-        priceInVideo: 0.075,
-        priceInAudio: 0.075,
-        priceOutText: 0.30,
-        priceOutImage: 0.30,
-        priceOutVideo: 0.30,
-        priceOutAudio: 0.30,
+        priceInText: 0.30,
+        priceInImage: 0.30,
+        priceInVideo: 0.30,
+        priceInAudio: 1,
+        priceOutText: 2.5,
+        priceOutImage: -1,
+        priceOutVideo: -1,
+        priceOutAudio: -1,
 
-        gsuCapacity: 1000
+        gsuCapacity: 2690,
+
+        longContextConfig: {
+            threshold: 200000,
+            burnInText: 1.0,
+            burnInImage: 1.0,
+            burnInVideo: 1.0,
+            burnInAudio: 4.0,
+            burnOutText: 9.0,
+            burnOutImage: -1,
+            burnOutVideo: -1,
+            burnOutAudio: -1,
+
+            priceInText: 0.30,
+            priceInImage: 0.30,
+            priceInVideo: 0.30,
+            priceInAudio: 1,
+            priceOutText: 2.5,
+            priceOutImage: -1,
+            priceOutVideo: -1,
+            priceOutAudio: -1
+        }
     },
     {
         id: 'gemini-2-5-flash-image',
-        name: 'Gemini 2.5 Flash (Image Gen)',
+        name: 'Gemini 2.5 Flash (Nano Banana)',
         burnInText: 1.0,
         burnInImage: 1.0,
         burnInVideo: 1.0,
-        burnInAudio: 1.0,
-        burnOutText: 9.0,
-        burnOutImage: 100.0, // High image output burn!
-        burnOutVideo: 1,
-        burnOutAudio: 1,
+        burnInAudio: 4.0, // Special rate!
+        burnOutText: 9.0, // High output burn!
+        burnOutImage: 100,
+        burnOutVideo: -1,
+        burnOutAudio: -1,
 
-        priceInText: 0.10,
-        priceInImage: 0.10,
-        priceInVideo: 0.10,
-        priceInAudio: 0.10,
-        priceOutText: 0.40,
-        priceOutImage: 0.40,
-        priceOutVideo: 0.40,
-        priceOutAudio: 0.40,
-        gsuCapacity: 1000
+        priceInText: 0.30,
+        priceInImage: 0.30,
+        priceInVideo: 0.30,
+        priceInAudio: 1,
+        priceOutText: 2.5,
+        priceOutImage: 30,
+        priceOutVideo: -1,
+        priceOutAudio: -1,
+
+        gsuCapacity: 2690,
+
+        longContextConfig: {
+            threshold: 200000,
+            burnInText: 1.0,
+            burnInImage: 1.0,
+            burnInVideo: 1.0,
+            burnInAudio: 4.0,
+            burnOutText: 9.0,
+            burnOutImage: 100,
+            burnOutVideo: -1,
+            burnOutAudio: -1,
+
+            priceInText: 0.30,
+            priceInImage: 0.30,
+            priceInVideo: 0.30,
+            priceInAudio: 1,
+            priceOutText: 2.5,
+            priceOutImage: 30,
+            priceOutVideo: -1,
+            priceOutAudio: -1
+        }
     }
 ];
 
-export const DEFAULT_MODEL_ID = 'gemini-3-pro';
+export const DEFAULT_MODEL_ID = 'gemini-3-pro-preview';
 
 export const PT_PRICING = {
     MONTHLY: 2700,
