@@ -249,7 +249,7 @@ const App: React.FC = () => {
         <header className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex items-center space-x-4">
             <div className="bg-white p-3 rounded-xl shadow-lg shadow-blue-100">
-              <img src="/gemini_2025_96dp.svg" className="w-8 h-8" alt="Gemini Logo" />
+              <img src="/gemini.svg" className="w-8 h-8" alt="Gemini Logo" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Vertex AI Provisioned Throughput Estimator</h1>
