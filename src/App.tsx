@@ -4,12 +4,19 @@ import {
   ComposedChart, Bar, Line, Cell, Label, ReferenceDot
 } from 'recharts';
 import {
-  Settings, Zap, TrendingUp, Server, Clock, Box, ChevronDown, Check, Info
+  Settings, Zap, TrendingUp, Server, Clock, Box, ChevronDown, Check, Info, Share
 } from 'lucide-react';
 import Background3DDefault from './components/Background3D';
 import { GEMINI_MODELS, DEFAULT_MODEL_ID, PT_PRICING } from './data/models';
 
-import GeminiLogo from './assets/gemini.svg';
+import GeminiLogo from './assets/gemini.png';
+
+import ShareModal from './components/ShareModal';
+import Toast from './components/Toast';
+import { toPng } from 'html-to-image';
+
+
+// --- SUBCOMPONENTS ---
 
 const App: React.FC = () => {
   // --- STATE ---
@@ -243,8 +250,56 @@ const App: React.FC = () => {
 
   const isLongContext = currentModel.longContextConfig && totalInputTps > currentModel.longContextConfig.threshold;
 
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [shareImage, setShareImage] = useState<string | null>(null);
+  const [isGeneratingShare, setIsGeneratingShare] = useState(false);
+  const [toastMsg, setToastMsg] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
+
+  const handleShare = async () => {
+    setIsGeneratingShare(true);
+    setShareImage(null); // Reset
+
+    // Wait for a brief moment to ensure UI allows spinner to render
+    setTimeout(async () => {
+      try {
+        const dataUrl = await toPng(document.body, {
+          cacheBust: true,
+          backgroundColor: '#ffffff', // Ensure white background
+          pixelRatio: 2, // High DPI
+          filter: (node) => {
+            // Exclude the share button from the screenshot if desired, 
+            // or other interactive elements. 
+            // Note: html-to-image filter receives a DOM node.
+            if (node.tagName === 'BUTTON' && node.textContent?.includes('Share')) {
+              return false;
+            }
+            return true;
+          }
+        });
+        setShareImage(dataUrl);
+        setIsShareModalOpen(true);
+      } catch (err) {
+        console.error("Screenshot failed", err);
+        setToastMsg({ msg: "Failed to generate screenshot. Please try again.", type: 'error' });
+      } finally {
+        setIsGeneratingShare(false);
+      }
+    }, 100);
+  };
+
   return (
     <div className="min-h-screen font-sans text-slate-600 relative overflow-hidden">
+      <Toast
+        message={toastMsg?.msg || null}
+        type={toastMsg?.type}
+        onClose={() => setToastMsg(null)}
+      />
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        imageSrc={shareImage}
+        modelId={selectedModelId}
+      />
       <Background3DDefault />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">     {/* HEADER */}
@@ -254,16 +309,24 @@ const App: React.FC = () => {
               <img src={GeminiLogo} className="w-8 h-8" alt="Gemini Logo" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Vertex AI Provisioned Throughput Estimator</h1>
-              <p className="text-slate-500 text-sm">Gemini Cost Optimization Engine</p>
+              <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Vertex AI Provisioned Throughput Calculator</h1>
+              {/* <p className="text-slate-500 text-xs">by natavit</p> */}
             </div>
           </div>
-          {/* <div className="flex items-center space-x-2 bg-white px-4 py-2 rounded-full shadow-sm border border-slate-200">
-            <div className={`w-2 h-2 rounded-full ${results.isPtCheaper ? 'bg-indigo-500' : 'bg-emerald-500'} animate-pulse`}></div>
-            <span className="text-xs font-semibold text-slate-600 uppercase tracking-wide">
-              Recommendation: {results.isPtCheaper ? 'Provisioned Throughput' : 'Pay-as-you-go'}
-            </span>
-          </div> */}
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={handleShare}
+              disabled={isGeneratingShare}
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl shadow-sm hover:bg-slate-50 transition-colors text-sm font-bold text-slate-600 disabled:opacity-50"
+            >
+              {isGeneratingShare ? (
+                <div className="animate-spin w-4 h-4 border-2 border-slate-300 border-t-blue-500 rounded-full"></div>
+              ) : (
+                <Share size={16} />
+              )}
+              <span>Share</span>
+            </button>
+          </div>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -592,6 +655,10 @@ const App: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <footer className="w-full text-center py-6 text-slate-400 text-xs font-medium relative z-10 transition-colors hover:text-blue-500 cursor-default">
+        by James Natavit
+      </footer>
     </div>
   );
 };
