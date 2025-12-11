@@ -355,7 +355,26 @@ const App: React.FC = () => {
                     </div>
 
                     <div className="pt-3 mt-1 border-t border-slate-100 flex justify-between items-center">
-                      <span className="text-xs font-bold text-slate-500 uppercase">Total Capacity</span>
+                      <div className="flex items-center gap-1.5 group relative cursor-help">
+                        <span className="text-xs font-bold text-slate-500 uppercase border-b border-dashed border-slate-300">Total Capacity</span>
+                        <Info className="w-3 h-3 text-slate-400" />
+
+                        <div className="absolute left-0 bottom-full mb-2 w-max max-w-[240px] bg-slate-900 text-white p-3 rounded-xl shadow-xl z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none">
+                          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 border-b border-slate-700 pb-2">
+                            Burndown Calculation
+                          </div>
+                          <p className="text-[10px] text-slate-300 mb-2 leading-relaxed">
+                            Total Burndown Units per second required to support the peak traffic load.
+                          </p>
+                          <div className="space-y-1 font-mono text-[10px]">
+                            <div className="flex justify-between gap-4"><span>Total Inputs:</span> <span className="text-blue-300">{results.totalBurnIn.toLocaleString()}</span></div>
+                            <div className="flex justify-between gap-4"><span>Total Outputs:</span> <span className="text-indigo-300">{results.totalBurnOut.toLocaleString()}</span></div>
+                            <div className="border-t border-slate-700 my-1"></div>
+                            <div className="flex justify-between gap-4 font-bold"><span>Total Required:</span> <span className="text-white">{(results.totalBurnIn + results.totalBurnOut).toLocaleString()}</span></div>
+                          </div>
+                        </div>
+                      </div>
+
                       <span className="text-sm font-bold text-blue-600">
                         {(results.totalBurnIn + results.totalBurnOut).toLocaleString()} <span className="text-xs text-slate-400 font-medium">Burndown</span>
                       </span>
