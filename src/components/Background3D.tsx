@@ -32,7 +32,7 @@ const Background3D: React.FC = () => {
         const blobs = [
             {
                 cx: width * 0.8, cy: height * 0.2, r: 250,
-                colorStops: ['rgba(99, 102, 241, 0.2)', 'rgba(168, 85, 247, 0.1)'],
+                colorStops: ['rgba(59, 130, 246, 0.2)', 'rgba(34, 211, 238, 0.1)'], // blue-500 to cyan-400
                 speed: 0.002, offset: 0,
                 detail: 16  // lat/lon lines
             },

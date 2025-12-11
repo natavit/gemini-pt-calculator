@@ -4,7 +4,7 @@ import {
   ComposedChart, Bar, Line, Cell, Label, ReferenceDot
 } from 'recharts';
 import {
-  Settings, Zap, TrendingUp, Cloud, Server, Clock, Box, ChevronDown, Check, Info
+  Settings, Zap, TrendingUp, Server, Clock, Box, ChevronDown, Check, Info
 } from 'lucide-react';
 import Background3DDefault from './components/Background3D';
 import { GEMINI_MODELS, DEFAULT_MODEL_ID, PT_PRICING } from './data/models';
@@ -248,8 +248,8 @@ const App: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">     {/* HEADER */}
         <header className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex items-center space-x-4">
-            <div className="bg-white p-3 rounded-xl shadow-lg shadow-indigo-100">
-              <Cloud className="text-indigo-600 w-8 h-8" />
+            <div className="bg-white p-3 rounded-xl shadow-lg shadow-blue-100">
+              <img src="/gemini_2025_96dp.svg" className="w-8 h-8" alt="Gemini Logo" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Vertex AI Provisioned Throughput Estimator</h1>
@@ -273,7 +273,7 @@ const App: React.FC = () => {
             <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 overflow-hidden border border-slate-100">
               <div className="px-6 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Server className="w-4 h-4 text-indigo-500" />
+                  <Server className="w-4 h-4 text-blue-500" />
                   <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Workload Profile</h2>
                 </div>
               </div>
@@ -294,7 +294,7 @@ const App: React.FC = () => {
                     <span className="text-slate-500">PayGo Est (Text):</span>
                     <span>In <span className="text-slate-700 font-bold">${priceInText}</span></span>
                     <span>Out <span className="text-slate-700 font-bold">${priceOutText}</span></span>
-                    {isLongContext && <span className="bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded text-[9px] border border-indigo-200">LONG CONTEXT ACTIVE</span>}
+                    {isLongContext && <span className="bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded text-[9px] border border-blue-200">LONG CONTEXT ACTIVE</span>}
                   </div>
                   <div className="flex gap-4 items-center">
                     <span className="text-slate-500">Capacity:</span>
@@ -314,19 +314,19 @@ const App: React.FC = () => {
                         <div className="grid grid-cols-2 gap-3">
                           <div>
                             <NumberInput label="Text" value={tpsInText} setValue={setTpsInText} step={100} disabled={priceInText === -1} />
-                            <div className="text-[10px] text-right text-slate-400 mt-1">{burnInText}x = <span className="text-indigo-500 font-mono">{(tpsInText * burnInText).toLocaleString()}</span></div>
+                            <div className="text-[10px] text-right text-slate-400 mt-1">{burnInText}x = <span className="text-blue-500 font-mono">{(tpsInText * burnInText).toLocaleString()}</span></div>
                           </div>
                           <div>
                             <NumberInput label="Image" value={tpsInImage} setValue={setTpsInImage} step={1} disabled={priceInImage === -1} />
-                            <div className="text-[10px] text-right text-slate-400 mt-1">{burnInImage}x = <span className="text-indigo-500 font-mono">{(tpsInImage * burnInImage).toLocaleString()}</span></div>
+                            <div className="text-[10px] text-right text-slate-400 mt-1">{burnInImage}x = <span className="text-blue-500 font-mono">{(tpsInImage * burnInImage).toLocaleString()}</span></div>
                           </div>
                           <div>
                             <NumberInput label="Video" value={tpsInVideo} setValue={setTpsInVideo} step={1} disabled={priceInVideo === -1} />
-                            <div className="text-[10px] text-right text-slate-400 mt-1">{burnInVideo}x = <span className="text-indigo-500 font-mono">{(tpsInVideo * burnInVideo).toLocaleString()}</span></div>
+                            <div className="text-[10px] text-right text-slate-400 mt-1">{burnInVideo}x = <span className="text-blue-500 font-mono">{(tpsInVideo * burnInVideo).toLocaleString()}</span></div>
                           </div>
                           <div>
                             <NumberInput label="Audio" value={tpsInAudio} setValue={setTpsInAudio} step={1} disabled={priceInAudio === -1} />
-                            <div className="text-[10px] text-right text-slate-400 mt-1">{burnInAudio}x = <span className="text-indigo-500 font-mono">{(tpsInAudio * burnInAudio).toLocaleString()}</span></div>
+                            <div className="text-[10px] text-right text-slate-400 mt-1">{burnInAudio}x = <span className="text-blue-500 font-mono">{(tpsInAudio * burnInAudio).toLocaleString()}</span></div>
                           </div>
                         </div>
                       </div>
@@ -336,19 +336,19 @@ const App: React.FC = () => {
                         <div className="grid grid-cols-2 gap-3">
                           <div>
                             <NumberInput label="Text" value={tpsOutText} setValue={setTpsOutText} step={10} disabled={priceOutText === -1} />
-                            <div className="text-[10px] text-right text-slate-400 mt-1">{burnOutText}x = <span className="text-indigo-500 font-mono">{(tpsOutText * burnOutText).toLocaleString()}</span></div>
+                            <div className="text-[10px] text-right text-slate-400 mt-1">{burnOutText}x = <span className="text-blue-500 font-mono">{(tpsOutText * burnOutText).toLocaleString()}</span></div>
                           </div>
                           <div>
                             <NumberInput label="Image" value={tpsOutImage} setValue={setTpsOutImage} step={1} disabled={priceOutImage === -1} />
-                            <div className="text-[10px] text-right text-slate-400 mt-1">{burnOutImage}x = <span className="text-indigo-500 font-mono">{(tpsOutImage * burnOutImage).toLocaleString()}</span></div>
+                            <div className="text-[10px] text-right text-slate-400 mt-1">{burnOutImage}x = <span className="text-blue-500 font-mono">{(tpsOutImage * burnOutImage).toLocaleString()}</span></div>
                           </div>
                           <div>
                             <NumberInput label="Video" value={tpsOutVideo} setValue={setTpsOutVideo} step={1} disabled={priceOutVideo === -1} />
-                            <div className="text-[10px] text-right text-slate-400 mt-1">{burnOutVideo}x = <span className="text-indigo-500 font-mono">{(tpsOutVideo * burnOutVideo).toLocaleString()}</span></div>
+                            <div className="text-[10px] text-right text-slate-400 mt-1">{burnOutVideo}x = <span className="text-blue-500 font-mono">{(tpsOutVideo * burnOutVideo).toLocaleString()}</span></div>
                           </div>
                           <div>
                             <NumberInput label="Audio" value={tpsOutAudio} setValue={setTpsOutAudio} step={1} disabled={priceOutAudio === -1} />
-                            <div className="text-[10px] text-right text-slate-400 mt-1">{burnOutAudio}x = <span className="text-indigo-500 font-mono">{(tpsOutAudio * burnOutAudio).toLocaleString()}</span></div>
+                            <div className="text-[10px] text-right text-slate-400 mt-1">{burnOutAudio}x = <span className="text-blue-500 font-mono">{(tpsOutAudio * burnOutAudio).toLocaleString()}</span></div>
                           </div>
                         </div>
                       </div>
@@ -356,8 +356,8 @@ const App: React.FC = () => {
 
                     <div className="pt-3 mt-1 border-t border-slate-100 flex justify-between items-center">
                       <span className="text-xs font-bold text-slate-500 uppercase">Total Capacity</span>
-                      <span className="text-sm font-bold text-indigo-600">
-                        {(results.totalBurnIn + results.totalBurnOut).toLocaleString()} <span className="text-xs text-indigo-400 font-medium">BD Units</span>
+                      <span className="text-sm font-bold text-blue-600">
+                        {(results.totalBurnIn + results.totalBurnOut).toLocaleString()} <span className="text-xs text-slate-400 font-medium">Burndown</span>
                       </span>
                     </div>
                   </div>
@@ -423,7 +423,7 @@ const App: React.FC = () => {
           <div className="lg:col-span-8 space-y-6">
 
             {/* HERO RESULT CARD */}
-            <div className={`rounded-3xl p-8 text-white shadow-2xl transition-all duration-500 relative overflow-hidden ${results.isPtCheaper ? 'bg-gradient-to-r from-indigo-600 to-violet-600 shadow-indigo-200' : 'bg-gradient-to-r from-slate-800 to-slate-900 shadow-slate-200'}`}>
+            <div className={`rounded-3xl p-8 text-white shadow-2xl transition-all duration-500 relative overflow-hidden ${results.isPtCheaper ? 'bg-gradient-to-r from-blue-600 to-cyan-600 shadow-blue-200' : 'bg-gradient-to-r from-slate-800 to-slate-900 shadow-slate-200'}`}>
               {/* Background FX */}
               <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl"></div>
               <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-black opacity-10 rounded-full blur-2xl"></div>
@@ -458,7 +458,7 @@ const App: React.FC = () => {
                 value={results.gsusNeeded}
                 unit="GSUs"
                 desc={`To handle ${results.peakUnitsNeeded.toLocaleString()} peak units`}
-                icon={<Server className="text-violet-500" />}
+                icon={<Server className="text-blue-500" />}
               />
               <MetricCard
                 title="Effective Utilization"
@@ -474,7 +474,7 @@ const App: React.FC = () => {
             <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-6 md:p-8 border border-slate-100">
               <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 bg-indigo-50 rounded-lg text-indigo-600"><Clock size={20} /></div>
+                  <div className="p-2 bg-blue-50 rounded-lg text-blue-600"><Clock size={20} /></div>
                   <div>
                     <h3 className="text-lg font-bold text-slate-900">24-Hour Traffic Simulator</h3>
                     <p className="text-slate-500 text-xs">Visualizing wasted capacity (gap between bars and dashed line)</p>
@@ -495,10 +495,10 @@ const App: React.FC = () => {
                     <XAxis dataKey="hour" tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} interval={3} />
                     <YAxis tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
                     <Tooltip content={<DailyTooltip />} />
-                    <Line type="step" dataKey="capacity" stroke="#6366f1" strokeDasharray="4 4" strokeWidth={2} dot={false} activeDot={false} name="Paid Capacity" />
+                    <Line type="step" dataKey="capacity" stroke="#3b82f6" strokeDasharray="4 4" strokeWidth={2} dot={false} activeDot={false} name="Paid Capacity" />
                     <Bar dataKey="tps" radius={[4, 4, 0, 0]} name="Actual Traffic">
                       {dailyData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.isPeak ? '#4f46e5' : '#cbd5e1'} />
+                        <Cell key={`cell-${index}`} fill={entry.isPeak ? '#2563eb' : '#cbd5e1'} />
                       ))}
                     </Bar>
                   </ComposedChart>
@@ -527,10 +527,10 @@ const App: React.FC = () => {
                     <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 10 }} tickFormatter={(v) => `$${v / 1000}k`} />
                     <Tooltip content={<BreakEvenTooltip formatCurrency={formatCurrency} />} />
                     <Area type="monotone" dataKey="paygo" stroke="#10b981" strokeWidth={3} fill="url(#colorPaygo)" name="PayGo" />
-                    <Line type="monotone" dataKey="pt" stroke="#6366f1" strokeWidth={3} strokeDasharray="6 6" dot={false} name="Provisioned" />
+                    <Line type="monotone" dataKey="pt" stroke="#3b82f6" strokeWidth={3} strokeDasharray="6 6" dot={false} name="Provisioned" />
                     {breakEvenData.breakEvenX >= 0 && (
                       <ReferenceLine x={breakEvenData.breakEvenX} stroke="#f59e0b" strokeWidth={2} strokeDasharray="3 3">
-                        <Label value="Break-Even" position="top" offset={10} fill="#f59e0b" fontSize={10} fontWeight="bold" />
+                        <Label value="Break-Even (1y)" position="top" offset={10} fill="#f59e0b" fontSize={10} fontWeight="bold" />
                       </ReferenceLine>
                     )}
                     {breakEvenData.breakEvenX >= 0 && (
@@ -597,10 +597,10 @@ const ModelSelector = ({ models, selectedId, onSelect }: any) => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full bg-slate-50 border border-slate-200 rounded-xl pl-4 pr-4 py-3 text-slate-900 font-medium flex items-center justify-between transition-all hover:bg-slate-100 hover:border-slate-300 focus:ring-2 focus:ring-indigo-500/20 active:scale-[0.99] ${isOpen ? 'ring-2 ring-indigo-500/20 border-indigo-500' : ''}`}
+        className={`w-full bg-slate-50 border border-slate-200 rounded-xl pl-4 pr-4 py-3 text-slate-900 font-medium flex items-center justify-between transition-all hover:bg-slate-100 hover:border-slate-300 focus:ring-2 focus:ring-blue-500/20 active:scale-[0.99] ${isOpen ? 'ring-2 ring-blue-500/20 border-blue-500' : ''}`}
       >
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-white shadow-sm border border-slate-100 flex items-center justify-center text-indigo-600">
+          <div className="w-8 h-8 rounded-lg bg-white shadow-sm border border-slate-100 flex items-center justify-center text-blue-600">
             <Box size={16} />
           </div>
           <span className="text-sm">{selectedModel.name}</span>
@@ -620,13 +620,13 @@ const ModelSelector = ({ models, selectedId, onSelect }: any) => {
                   onSelect(model.id);
                   setIsOpen(false);
                 }}
-                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm text-left transition-colors ${isActive ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:bg-slate-50'}`}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm text-left transition-colors ${isActive ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-slate-600 hover:bg-slate-50'}`}
               >
                 <span className="flex items-center gap-2">
-                  <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-indigo-500' : 'bg-slate-300'}`}></span>
+                  <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-blue-500' : 'bg-slate-300'}`}></span>
                   {model.name}
                 </span>
-                {isActive && <Check size={14} className="text-indigo-600" />}
+                {isActive && <Check size={14} className="text-blue-600" />}
               </button>
             );
           })}
@@ -678,7 +678,7 @@ const NumberInput = ({ label, value, setValue, step, disabled }: any) => {
           onBlur={handleBlur}
           step={step}
           disabled={disabled}
-          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-medium focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all group-hover:bg-slate-100 disabled:bg-slate-100"
+          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-medium focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all group-hover:bg-slate-100 disabled:bg-slate-100"
         />
         <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-400 text-xs font-bold">TPS</div>
       </div>
@@ -691,7 +691,7 @@ const PriceInput = ({ label, value, setValue }: any) => (
     <span className="absolute left-3 top-2.5 text-slate-400 text-sm">$</span>
     <input
       type="number" value={value} onChange={e => setValue(Number(e.target.value))}
-      className="w-full pl-6 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:ring-2 focus:ring-indigo-500 outline-none"
+      className="w-full pl-6 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none"
     />
     <span className="absolute right-2 top-3 text-[10px] text-slate-400 font-bold uppercase">{label}</span>
   </div>
@@ -704,7 +704,7 @@ const RangeControl = ({ label, value, setValue, min, max, suffix, desc }: any) =
         <label className="text-sm font-bold text-slate-700">{label}</label>
         <p className="text-xs text-slate-400">{desc}</p>
       </div>
-      <div className="text-lg font-bold text-indigo-600">{value}<span className="text-sm text-slate-400 ml-1 font-medium">{suffix}</span></div>
+      <div className="text-lg font-bold text-blue-600">{value}<span className="text-sm text-slate-400 ml-1 font-medium">{suffix}</span></div>
     </div>
     <input type="range" min={min} max={max} value={value} onChange={e => setValue(Number(e.target.value))} className="range-input" />
   </div>
@@ -732,13 +732,13 @@ const TableRow = ({ label, cost, base, isBase, highlight, details }: any) => {
   const isCheaper = diff < 0;
 
   return (
-    <tr className={`group transition-colors ${highlight ? 'bg-indigo-50/30' : 'hover:bg-slate-50'}`}>
-      <td className={`px-6 py-4 text-sm font-medium ${highlight ? 'text-indigo-900' : 'text-slate-700'}`}>
+    <tr className={`group transition-colors ${highlight ? 'bg-blue-50/30' : 'hover:bg-slate-50'}`}>
+      <td className={`px-6 py-4 text-sm font-medium ${highlight ? 'text-blue-900' : 'text-slate-700'}`}>
         <div className="flex items-center gap-2 relative">
           {label}
           {details && (
             <div className="group/info relative">
-              <Info className="w-3.5 h-3.5 text-slate-300 cursor-help hover:text-indigo-500 transition-colors" />
+              <Info className="w-3.5 h-3.5 text-slate-300 cursor-help hover:text-blue-500 transition-colors" />
               {/* TOOLTIP POPUP */}
               <div className="absolute left-6 top-1/2 -translate-y-1/2 w-64 bg-slate-900 text-white p-4 rounded-xl shadow-xl z-50 opacity-0 invisible group-hover/info:opacity-100 group-hover/info:visible transition-all duration-200 pointer-events-none">
                 <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 border-b border-slate-700 pb-2">
@@ -752,10 +752,11 @@ const TableRow = ({ label, cost, base, isBase, highlight, details }: any) => {
 
                   {(details.costInText > 0 || details.costInImage > 0) && (details.costOutText > 0 || details.costOutImage > 0) && <div className="border-t border-slate-700 my-1"></div>}
 
-                  {details.costOutText > 0 && <div className="flex justify-between"><span>Text Out:</span> <span className="font-mono text-indigo-300">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(details.costOutText)}</span></div>}
-                  {details.costOutImage > 0 && <div className="flex justify-between"><span>Image Out:</span> <span className="font-mono text-indigo-300">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(details.costOutImage)}</span></div>}
-                  {details.costOutVideo > 0 && <div className="flex justify-between"><span>Video Out:</span> <span className="font-mono text-indigo-300">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(details.costOutVideo)}</span></div>}
-                  {details.costOutAudio > 0 && <div className="flex justify-between"><span>Audio Out:</span> <span className="font-mono text-indigo-300">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(details.costOutAudio)}</span></div>}
+
+                  {details.costOutText > 0 && <div className="flex justify-between"><span>Text Out:</span> <span className="font-mono text-blue-300">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(details.costOutText)}</span></div>}
+                  {details.costOutImage > 0 && <div className="flex justify-between"><span>Image Out:</span> <span className="font-mono text-blue-300">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(details.costOutImage)}</span></div>}
+                  {details.costOutVideo > 0 && <div className="flex justify-between"><span>Video Out:</span> <span className="font-mono text-blue-300">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(details.costOutVideo)}</span></div>}
+                  {details.costOutAudio > 0 && <div className="flex justify-between"><span>Audio Out:</span> <span className="font-mono text-blue-300">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(details.costOutAudio)}</span></div>}
                 </div>
                 <div className="mt-3 text-[9px] text-slate-500 italic leading-tight">
                   Annual Sum of (TPS × UsageTime / 1M) × Price
