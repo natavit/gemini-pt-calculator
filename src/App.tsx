@@ -296,6 +296,10 @@ const App: React.FC = () => {
                     <span>Out <span className="text-slate-700 font-bold">${priceOutText}</span></span>
                     {isLongContext && <span className="bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded text-[9px] border border-indigo-200">LONG CONTEXT ACTIVE</span>}
                   </div>
+                  <div className="flex gap-4 items-center">
+                    <span className="text-slate-500">Capacity:</span>
+                    <span className="text-slate-700 font-bold">{gsuCapacity}/GSU</span>
+                  </div>
                 </div>
               </div>
 
@@ -394,7 +398,7 @@ const App: React.FC = () => {
                 </div>
 
                 <div className="grid grid-cols-1 gap-4">
-                  <div className="col-span-1 text-xs font-semibold text-slate-400 uppercase tracking-wide">PT Commit ($/GSU)</div>
+                  <div className="col-span-1 text-xs font-semibold text-slate-400 uppercase tracking-wide">PT Commit ($/GSU/Month)</div>
                   <PriceInput label="Monthly" value={ptMonthlyPrice} setValue={setPtMonthlyPrice} />
                   <PriceInput label="3-Month" value={ptQuarterlyPrice} setValue={setPtQuarterlyPrice} />
                   <PriceInput label="1-Year" value={ptYearlyPrice} setValue={setPtYearlyPrice} />
