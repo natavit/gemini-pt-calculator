@@ -305,8 +305,8 @@ const App: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">     {/* HEADER */}
         <header className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex items-center space-x-4">
-            <div className="bg-white p-3 rounded-xl shadow-lg shadow-blue-100">
-              <img src={GeminiLogo} className="h-8 w-auto" alt="Gemini Logo" />
+            <div className="bg-white p-3 rounded-xl shadow-lg shadow-blue-100 aspect-square flex items-center justify-center">
+              <img src={GeminiLogo} className="h-8 w-8 object-contain" alt="Gemini Logo" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Vertex AI Provisioned Throughput Calculator</h1>
